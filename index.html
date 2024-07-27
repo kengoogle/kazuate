@@ -1,86 +1,96 @@
-import React, { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-
-const NumberGuessingGame = () => {
-  const [targetNumber, setTargetNumber] = useState(0);
-  const [guess, setGuess] = useState('');
-  const [message, setMessage] = useState('');
-  const [attempts, setAttempts] = useState(0);
-  const [imageLoaded, setImageLoaded] = useState(false);
-
-  useEffect(() => {
-    generateNewNumber();
-  }, []);
-
-  const generateNewNumber = () => {
-    setTargetNumber(Math.floor(Math.random() * 100) + 1);
-    setMessage('');
-    setAttempts(0);
-  };
-
-  const handleGuess = () => {
-    const guessNumber = parseInt(guess);
-    setAttempts(attempts + 1);
-
-    if (isNaN(guessNumber)) {
-      setMessage('有効な数字を入力してください。');
-    } else if (guessNumber === targetNumber) {
-      setMessage(`正解です！${attempts + 1}回で当てました。`);
-    } else if (guessNumber < targetNumber) {
-      setMessage('もっと大きい数字です。');
-    } else {
-      setMessage('もっと小さい数字です。');
-    }
-
-    setGuess('');
-  };
-
-  const handleImageError = () => {
-    console.error('画像の読み込みに失敗しました');
-    setImageLoaded(false);
-  };
-
-  const handleImageLoad = () => {
-    setImageLoaded(true);
-  };
-
-  return (
-    <div className="p-4 max-w-md mx-auto">
-      <h1 className="text-2xl font-bold mb-4">数当てゲーム</h1>
-      {imageLoaded ? (
-        <img 
-          src="https://live.staticflickr.com/65535/53849007531_22c3a6599f_n.jpg" 
-          alt="ゲームイメージ" 
-          className="w-full mb-4 rounded-lg shadow-md"
-          onError={handleImageError}
-          onLoad={handleImageLoad}
-        />
-      ) : (
-        <div className="w-full h-48 bg-gray-200 flex items-center justify-center mb-4 rounded-lg">
-          <p>画像を読み込めません</p>
-        </div>
-      )}
-      <p className="mb-2">1から100の間の数字を当ててください。</p>
-      <div className="flex mb-4">
-        <Input
-          type="number"
-          value={guess}
-          onChange={(e) => setGuess(e.target.value)}
-          placeholder="数字を入力"
-          className="mr-2"
-        />
-        <Button onClick={handleGuess}>予想する</Button>
-      </div>
-      {message && (
-        <Alert className="mb-4">
-          <AlertDescription>{message}</AlertDescription>
-        </Alert>
-      )}
-      <Button onClick={generateNewNumber}>新しいゲームを始める</Button>
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数当てゲーム</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        .game-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        input, button {
+            margin: 10px 0;
+            padding: 10px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #message {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>数当てゲーム</h1>
+        <img src="https://live.staticflickr.com/65535/53849007531_22c3a6599f_n.jpg" alt="ゲームイメージ" onerror="this.onerror=null; this.src='https://via.placeholder.com/400x300?text=ゲームイメージ';">
+        <p>1から100の間の数字を当ててください。</p>
+        <input type="number" id="guessInput" placeholder="数字を入力">
+        <button onclick="checkGuess()">予想する</button>
+        <button onclick="resetGame()">新しいゲームを始める</button>
+        <p id="message"></p>
     </div>
-  );
-};
 
-export default NumberGuessingGame;
+    <script>
+        let targetNumber = Math.floor(Math.random() * 100) + 1;
+        let attempts = 0;
+
+        function checkGuess() {
+            const guess = parseInt(document.getElementById('guessInput').value);
+            const messageElement = document.getElementById('message');
+
+            if (isNaN(guess)) {
+                messageElement.textContent = '有効な数字を入力してください。';
+                return;
+            }
+
+            attempts++;
+
+            if (guess === targetNumber) {
+                messageElement.textContent = `正解です！${attempts}回で当てました。`;
+            } else if (guess < targetNumber) {
+                messageElement.textContent = 'もっと大きい数字です。';
+            } else {
+                messageElement.textContent = 'もっと小さい数字です。';
+            }
+
+            document.getElementById('guessInput').value = '';
+        }
+
+        function resetGame() {
+            targetNumber = Math.floor(Math.random() * 100) + 1;
+            attempts = 0;
+            document.getElementById('message').textContent = '';
+            document.getElementById('guessInput').value = '';
+        }
+    </script>
+</body>
+</html>
